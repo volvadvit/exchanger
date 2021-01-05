@@ -1,15 +1,15 @@
 package com.volvadvit.exchangerates
 
-import android.R
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.volvadvit.exchangerates.databinding.ActivityMainBinding
-import com.volvadvit.exchangerates.databinding.ListItemBinding
+import kotlinx.android.synthetic.main.activity_main.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -18,42 +18,42 @@ import org.jsoup.select.Elements
 
 class MainActivity : AppCompatActivity() {
 
-    private val REGION_LIST: List<String> = listOf("Ростов-на-Дону","Москва","Екатеренбург","Санкт-Петербург","Россия")
-    private val listUSD = ArrayList<Element>()
-    private val listEUR = ArrayList<Element>()
-    private val listGBP = ArrayList<Element>()
-    private val listKZT = ArrayList<Element>()
-    private val listCHF = ArrayList<Element>()
-    private val listJPY = ArrayList<Element>()
-    private val currencyList = listOf(listUSD, listEUR, listGBP, listKZT, listCHF, listJPY)
+    private val REGION_LIST: List<String> = listOf("Россия", "Ростов-на-Дону", "Москва", "Екатеренбург", "Санкт-Петербург")
+
+    private val currencyList = arrayListOf(
+            arrayListOf("", "", "", "", "", "", "", "", ""),
+            arrayListOf("", "", "", "", "", "", "", "", ""),
+            arrayListOf("", "", "", "", "", "", "", "", ""),
+            arrayListOf("", "", "", "", "", "", "", "", ""),
+            arrayListOf("", "", "", "", "", "", "", "", ""),
+            arrayListOf("", "", "", "", "", "", "", "", "")
+    )
 
     private lateinit var doc: Document  // store html-page data, have fun to get it in String
     private lateinit var secThread: Thread
     private lateinit var runnable: Runnable
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var bindingItem: ListItemBinding
     private lateinit var curTableElements: Elements
     private lateinit var mAdapter: RecyclerView.Adapter<CustomAdapter.ViewHolder>
     private var region: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Initialize recycler
         mAdapter = CustomAdapter(this, currencyList)
-        binding.recyclerView.adapter = mAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = mAdapter
 
         // Make spinner and spinnerAdapter
         val adapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(this, R.layout.simple_spinner_item, REGION_LIST)
+            ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, REGION_LIST)
         // Определяем разметку для использования при выборе элемента
-        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         // Применяем адаптер к элементу spinner
-        binding.spinner.adapter = adapter
-        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
                 init("")
             }
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         try {
             doc = Jsoup.connect("https://${region}bankiros.ru/currency").get()
             curTableElements = getTableElements()  // get all elements from table
-            binding.tableDate.text = getTableColumnName(3).text()
+            tableDate.text = getTableColumnName(3).text()
             makeList()
         } catch (e: Exception) {
             println(e.message)
@@ -84,28 +84,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeList() {
-        var i: Int = 2
-        for(list: MutableList<Element> in currencyList) {
-            list.add(getCurrencyInfo(2,0))  // name
-            list.add(getCurrencyInfo(2,1))  // byu
+        var currencyIndex = 2
+        for (list in currencyList) {
+            // name
+            list[0] = getCurrencyInfo(currencyIndex, 0)
+            // byu info
+            list[1] = getCurrencyInfo(currencyIndex, 1)  // byu value
             if (region == "") {
-                list.add(getBankName(true, i))
-                list.add(getCityName(true, i))
-                bindingItem.buyCityName.visibility = View.VISIBLE
-            } else if (region != "") {
-                list.add(getBankName(true, i))
-                // TODO (закончить заполенение листа, загрузить его в адаптер и привязать инфо к ТекстВью)
+                list[2] = getBankName(false, currencyIndex)
+                list[3] = getCityName(false, currencyIndex)
+            } else {
+                list[2] = getBankName(false, currencyIndex)
             }
-            list.add(getCurrencyInfo(2,2))  // trade
-            list.add(getCurrencyInfo(2,3))  // CB RF
-        }
+            // trade info
+            list[4] = getCurrencyInfo(currencyIndex, 2)  // trade value
+            if (region == "") {
+                list[5] = getBankName(true, currencyIndex)
+                list[6] = getCityName(true, currencyIndex)
+            } else {
+                list[5] = getBankName(true, currencyIndex)
+            }
+            list[7] = getCurrencyInfo(currencyIndex, 3)  // CB value
+            list[8] = getCBInfo(currencyIndex)  // CB info
 
-        mAdapter.notifyDataSetChanged()
+            currencyIndex++
+        }
+        runOnUiThread {
+            if (region == "") {
+                findViewById<TextView>(R.id.buy_city_name).visibility = View.VISIBLE
+                findViewById<TextView>(R.id.trade_city_name).visibility = View.VISIBLE
+            } else {
+                findViewById<TextView>(R.id.buy_city_name).visibility = View.INVISIBLE
+                findViewById<TextView>(R.id.trade_city_name).visibility = View.INVISIBLE
+            }
+        }
+        mAdapter.notifyDataSetChanged()// update recyclerView
     }
 
-
     private fun getRegion():String =
-        when(binding.spinner.selectedItem) {
+        when(spinner.selectedItem) {
             "Ростов-на-Дону" -> "rostov-na-donu."
             "Москва" -> "moskva."
             "Екатеренбург" -> "ekaterinburg."
@@ -113,6 +130,7 @@ class MainActivity : AppCompatActivity() {
             "Россия" -> ""
             else -> ""
         }
+
 
     private fun getTableElements(): Elements {
         val tables: Elements = doc.getElementsByTag("tbody")    // get array of all "tbody" elements on html-page
@@ -133,24 +151,35 @@ class MainActivity : AppCompatActivity() {
         return tableColumnName.child(section)
     }
 
-    private fun getCurrencyInfo(currency: Int, section: Int): Element {
-        /** currency: 2 - usd, 3 - eur, 4 - gbp, 5 - kzt, 6 - chf, 7 - jpy
-         * index: 0 - name, 1 - byu cost, 2 - trade cost, 3 - CB RF */
+    private fun getCurrencyInfo(currency: Int, section: Int): String {
+        /** currency: 2 - usd, 3 - eur, 4 - gbp, ... 7 -
+         * section: 0 - name, 1 - byu cost, 2 - trade cost, 3 - CB RF */
         val usdRaw: Element = curTableElements[currency]
-        return usdRaw.child(section)
+        return when(section) {
+            0 -> usdRaw.child(0).text()
+            1 -> usdRaw.child(section).child(0).text()
+            2 -> usdRaw.child(section).child(0).text()
+            3 -> usdRaw.child(section).child(0).text()
+            else -> usdRaw.child(0).text()
+        }
     }
 
-    private fun getBankName(trade: Boolean, currency: Int): Element {
-        /** trade: true - Покупка, trade: false - Продажа
-         * currency:    2 - usd, 3 - eur, 4 - gbp, 5 - kzt, 6 - chf, 7 - jpy
-         */
-        return curTableElements[currency].child( if (trade) 1 else 2).child(1)
+    private fun getBankName(trade: Boolean, currency: Int): String {
+        /** trade: true - Продажа, trade: false - Покупка
+         *  currency: 2 - usd, 3 - eur, 4 - gbp, ... 7 -
+        */
+        return curTableElements[currency].child(if (!trade) 1 else 2).child(1).text()
     }
-    private fun getCityName(trade: Boolean, currency: Int): Element {
+
+    private fun getCBInfo(currency: Int): String {
+        return curTableElements[currency].child(3).child(1).text()
+    }
+
+    private fun getCityName(trade: Boolean, currency: Int): String {
         /** ONLY FOR REGION - Россия !
-         * trade: true - Покупка, trade: false - Продажа
-         * currency:    2 - usd, 3 - eur, 4 - gbp, 5 - kzt, 6 - chf, 7 - jpy
-         */
-        return curTableElements[currency].child( if (trade) 1 else 2).child(2)
+         * trade: true - Продажа, trade: false - Покупка
+        * currency: 2 - usd, 3 - eur, 4 - gbp, ... 7 -
+        */
+        return curTableElements[currency].child(if (!trade) 1 else 2).child(2).text()
     }
 }

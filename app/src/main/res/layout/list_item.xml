@@ -2,20 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:background="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/currency"
+        android:id="@+id/currency_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,16 +25,16 @@
         android:textStyle="bold"
         android:textColor="@android:color/holo_blue_dark"
         android:textAllCaps="true"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginStart="10dp"/>
 
     <TextView
         android:id="@+id/buy_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="value"
-        app:layout_constraintStart_toEndOf="@+id/currency"
+        app:layout_constraintStart_toEndOf="@+id/currency_name"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="18sp"
+        android:textSize="15sp"
         android:layout_marginStart="20dp"
         android:textColor="@color/black"/>
 
@@ -44,21 +44,23 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/buy_value"
         app:layout_constraintStart_toStartOf="@+id/buy_value"
+        app:layout_constraintStart_toEndOf="@+id/currency_name"
         app:layout_constraintEnd_toEndOf="@+id/buy_value"
         android:text="Bank"
         android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"/>
+        android:textSize="12sp"/>
+
     <TextView
         android:id="@+id/buy_city_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/buy_bank_name"
-        app:layout_constraintStart_toStartOf="@+id/buy_bank_name"
-        app:layout_constraintEnd_toEndOf="@+id/buy_bank_name"
         android:text="Region"
-        android:visibility="invisible"
         android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"/>
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/buy_bank_name"
+        app:layout_constraintHorizontal_bias="0.363"
+        app:layout_constraintStart_toStartOf="@+id/buy_bank_name"
+        app:layout_constraintTop_toBottomOf="@+id/buy_bank_name" />
 
     <TextView
         android:id="@+id/trade_value"
@@ -67,8 +69,8 @@
         android:text="value"
         app:layout_constraintStart_toEndOf="@+id/buy_value"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="18sp"
-        android:layout_marginStart="40dp"
+        android:textSize="15sp"
+        android:layout_marginStart="70dp"
         android:textColor="@color/black"/>
 
     <TextView
@@ -77,21 +79,22 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/trade_value"
         app:layout_constraintStart_toStartOf="@+id/trade_value"
+        app:layout_constraintStart_toEndOf="@+id/buy_bank_name"
         app:layout_constraintEnd_toEndOf="@+id/trade_value"
         android:text="Bank"
         android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"/>
+        android:textSize="12sp"/>
     <TextView
         android:id="@+id/trade_city_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/trade_bank_name"
         app:layout_constraintStart_toStartOf="@+id/trade_bank_name"
+        app:layout_constraintStart_toEndOf="@+id/buy_city_name"
         app:layout_constraintEnd_toEndOf="@+id/trade_bank_name"
         android:text="Region"
-        android:visibility="invisible"
         android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"/>
+        android:textSize="12sp"/>
     <TextView
         android:id="@+id/CB_value"
         android:layout_width="wrap_content"
@@ -100,7 +103,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="18sp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="40dp"
         android:textColor="@color/black"/>
+    <TextView
+        android:id="@+id/CB_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/CB_value"
+        app:layout_constraintStart_toEndOf="@+id/trade_bank_name"
+        app:layout_constraintStart_toStartOf="@+id/CB_value"
+        app:layout_constraintEnd_toEndOf="@+id/CB_value"
+        android:layout_marginEnd="20dp"
+        android:text="for 1 y.e."
+        android:gravity="center"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
