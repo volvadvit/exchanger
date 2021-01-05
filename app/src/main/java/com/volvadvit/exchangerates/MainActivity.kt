@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.trade_city_name).visibility = View.INVISIBLE
             }
         }
+        recyclerView.smoothScrollToPosition(currencyList.size)
         mAdapter.notifyDataSetChanged()// update recyclerView
     }
 
