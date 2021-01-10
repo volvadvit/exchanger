@@ -119,6 +119,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mAdapter.notifyDataSetChanged()// update recyclerView
+        recyclerView.smoothScrollToPosition(mAdapter.itemCount - 1)
     }
 
     private fun getRegion():String =
