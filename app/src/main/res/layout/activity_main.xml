@@ -15,7 +15,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/title" />
+        app:layout_constraintBottom_toTopOf="@+id/title"
+        android:background="@android:color/holo_blue_light"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/title"

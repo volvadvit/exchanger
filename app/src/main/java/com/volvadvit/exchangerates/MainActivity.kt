@@ -7,6 +7,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             arrayListOf("", "", "", "", "", "", "", "", "")
     )
 
-    private lateinit var doc: Document  // store html-page data, have fun to get it in String
+    private lateinit var doc: Document  // store html-page data
     private lateinit var secThread: Thread
     private lateinit var runnable: Runnable
     private lateinit var curTableElements: Elements
@@ -60,6 +61,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long){
                 init(getRegion())
+                if (region == "") {
+                    findViewById<TextView>(R.id.buy_city_name).visibility = View.VISIBLE
+                    findViewById<TextView>(R.id.trade_city_name).visibility = View.VISIBLE
+                } else {
+                    findViewById<TextView>(R.id.buy_city_name).visibility = View.INVISIBLE
+                    findViewById<TextView>(R.id.trade_city_name).visibility = View.INVISIBLE
+                }
             }
         }
     }
@@ -110,16 +118,9 @@ class MainActivity : AppCompatActivity() {
             currencyIndex++
         }
         runOnUiThread {
-            if (region == "") {
-                findViewById<TextView>(R.id.buy_city_name).visibility = View.VISIBLE
-                findViewById<TextView>(R.id.trade_city_name).visibility = View.VISIBLE
-            } else {
-                findViewById<TextView>(R.id.buy_city_name).visibility = View.INVISIBLE
-                findViewById<TextView>(R.id.trade_city_name).visibility = View.INVISIBLE
-            }
+            mAdapter.notifyDataSetChanged()// update recyclerView
+            recyclerView.layoutManager?.scrollToPosition(mAdapter.itemCount)
         }
-        mAdapter.notifyDataSetChanged()// update recyclerView
-        recyclerView.smoothScrollToPosition(mAdapter.itemCount - 1)
     }
 
     private fun getRegion():String =
